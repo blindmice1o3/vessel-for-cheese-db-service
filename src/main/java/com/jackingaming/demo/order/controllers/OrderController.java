@@ -4,10 +4,7 @@ import com.jackingaming.demo.order.models.MenuItemInfo;
 import com.jackingaming.demo.order.models.MenuItemInfoListWrapper;
 import com.jackingaming.demo.order.models.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +16,14 @@ public class OrderController {
     private OrderRepository repository;
 
     private List<MenuItemInfo> menuItemInfosLocal = new ArrayList<>();
+
+    @GetMapping(path = "/all",
+            produces = "application/json")
+    public MenuItemInfoListWrapper getAllOrders() {
+        System.out.println("getAllOrders()");
+    
+        return new MenuItemInfoListWrapper(menuItemInfosLocal);
+    }
 
     @PostMapping(path = "/append",
             consumes = "application/json",
