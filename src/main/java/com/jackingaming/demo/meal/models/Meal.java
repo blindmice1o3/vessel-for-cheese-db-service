@@ -1,4 +1,4 @@
-package com.jackingaming.demo.models;
+package com.jackingaming.demo.meal.models;
 
 import jakarta.persistence.*;
 

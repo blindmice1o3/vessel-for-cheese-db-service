@@ -1,7 +1,7 @@
-package com.jackingaming.demo.controllers;
+package com.jackingaming.demo.meal.controllers;
 
-import com.jackingaming.demo.models.Meal;
-import com.jackingaming.demo.models.MealRepository;
+import com.jackingaming.demo.meal.models.MealRepository;
+import com.jackingaming.demo.meal.models.Meal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
