@@ -1,40 +1,34 @@
 package com.jackingaming.demo.order.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@Entity
 public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    private String nameDrink;
-    private int sizeDrink;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime createdOn;
+    private List<MenuItemInfo> menuItemInfos;
 
     public Order() {
     }
 
-    public Order(String nameDrink, int sizeDrink) {
-        this.nameDrink = nameDrink;
-        this.sizeDrink = sizeDrink;
+    public Order(LocalDateTime createdOn, List<MenuItemInfo> menuItemInfos) {
+        this.createdOn = createdOn;
+        this.menuItemInfos = menuItemInfos;
     }
 
-    public String getNameDrink() {
-        return nameDrink;
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
     }
 
-    public void setNameDrink(String nameDrink) {
-        this.nameDrink = nameDrink;
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 
-    public int getSizeDrink() {
-        return sizeDrink;
+    public List<MenuItemInfo> getMenuItemInfos() {
+        return menuItemInfos;
     }
 
-    public void setSizeDrink(int sizeDrink) {
-        this.sizeDrink = sizeDrink;
+    public void setMenuItemInfos(List<MenuItemInfo> menuItemInfos) {
+        this.menuItemInfos = menuItemInfos;
     }
 }
