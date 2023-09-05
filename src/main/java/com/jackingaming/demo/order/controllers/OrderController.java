@@ -1,10 +1,14 @@
 package com.jackingaming.demo.order.controllers;
 
-import com.jackingaming.demo.order.models.DataStore;
+import com.jackingaming.demo.order.models.LocalDateTimeDTO;
 import com.jackingaming.demo.order.models.Order;
+import com.jackingaming.demo.order.models.OrderDTO;
 import com.jackingaming.demo.order.models.legacy.OrderOldVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,24 +22,93 @@ public class OrderController {
 
     private List<Order> orders = new ArrayList<>();
 
-    @GetMapping(path = "/all",
+    @PostMapping(path = "/fetch_newer",
+            consumes = "application/json",
             produces = "application/json")
-    public DataStore getAllOrders() {
-        System.out.println("getAllOrders()");
+    public OrderDTO fetchNewerOrders(@RequestBody LocalDateTimeDTO localDateTimeDTO) {
+        System.out.println("fetchNewerOrders(LocalDateTimeDTO)");
 
-        return new DataStore(orders);
+        LocalDateTime timestampNewestClient = localDateTimeDTO.getLocalDateTime();
+        System.out.println("timestampNewestClient: " + timestampNewestClient.toString());
+
+        List<Order> ordersNewerThanClient = new ArrayList<>();
+        if (!orders.isEmpty()) {
+            System.out.println("orders NOT EMPTY... find indexFrom");
+
+            // find first index that is newer than client's most recent timestamp.
+            int indexFrom = -1;
+            int indexEnd = orders.size() - 1;
+            LocalDateTime timestampLocal = orders.get(indexEnd).getCreatedOn();
+            if (timestampNewestClient.isBefore(timestampLocal)) {
+                System.out.println("timestampNewestClient.isBefore(timestampLocal)");
+
+                // start at last element (end of list)
+                for (int i = indexEnd; i >= 0; i--) {
+                    timestampLocal = orders.get(i).getCreatedOn();
+
+                    if (timestampNewestClient.isBefore(timestampLocal)) {
+                        if (i == 0) {
+                            indexFrom = 0;
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    indexFrom = i + 1;
+                    break;
+                }
+
+                ordersNewerThanClient.addAll(
+                        orders.subList(indexFrom, orders.size())
+                );
+            } else {
+                System.out.println("NOT timestampNewestClient.isBefore(timestampLocal)... do nothing");
+            }
+        } else {
+            System.out.println("orders EMPTY... do nothing");
+        }
+
+        return new OrderDTO(ordersNewerThanClient);
     }
 
     @PostMapping(path = "/append",
             consumes = "application/json",
             produces = "application/json")
-    public Order appendNewOrder(@RequestBody Order order) {
-        System.out.println("appendNewOrder()");
+    public Order appendNewOrder(@RequestBody Order orderFromClient) {
+        System.out.println("appendNewOrder(Order)");
 
-        orders.add(order);
-        LocalDateTime createdOn = order.getCreatedOn();
-        System.out.println("createdOn: " + createdOn.toString());
+        LocalDateTime timestampClient = orderFromClient.getCreatedOn();
+        System.out.println("timestampClient: " + timestampClient.toString());
 
-        return order;
+        if (!orders.isEmpty()) {
+            System.out.println("orders NOT EMPTY... find where to be inserted");
+
+            // sort by timestamp (old-to-new)
+            // (first element is oldest, last element is newest)
+            // start at last element (end of list)
+            int indexEnd = orders.size() - 1;
+            for (int i = indexEnd; i >= 0; i--) {
+                LocalDateTime timestampLocal = orders.get(i).getCreatedOn();
+
+                if (timestampClient.isBefore(timestampLocal)) {
+                    if (i == 0) {
+                        orders.add(0, orderFromClient);
+                        break;
+                    }
+
+                    continue;
+                }
+
+                orders.add(i + 1, orderFromClient);
+                break;
+            }
+        } else {
+            System.out.println("orders EMPTY... insert into list");
+
+            orders.add(orderFromClient);
+        }
+
+        return orderFromClient;
     }
 }
