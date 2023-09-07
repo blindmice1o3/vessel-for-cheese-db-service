@@ -1,16 +1,13 @@
 package com.jackingaming.demo.order.controllers;
 
-import com.jackingaming.demo.order.models.LocalDateTimeDTO;
 import com.jackingaming.demo.order.models.Order;
 import com.jackingaming.demo.order.models.OrderDTO;
 import com.jackingaming.demo.order.models.legacy.OrderOldVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +19,14 @@ public class OrderController {
 
     private List<Order> orders = new ArrayList<>();
 
-    @PostMapping(path = "/fetch_newer",
-            consumes = "application/json",
+    @GetMapping(path = "",
             produces = "application/json")
-    public OrderDTO fetchNewerOrders(@RequestBody LocalDateTimeDTO localDateTimeDTO) {
-        System.out.println("fetchNewerOrders(LocalDateTimeDTO)");
+    public OrderDTO fetchNewerOrders(@RequestParam String timestamp) {
+        System.out.println("fetchNewerOrders(String)");
 
-        LocalDateTime timestampNewestClient = localDateTimeDTO.getLocalDateTime();
-        System.out.println("timestampNewestClient: " + timestampNewestClient.toString());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime timestampNewestClient = LocalDateTime.parse(timestamp, formatter);
+        System.out.println("timestampNewestClient: " + timestampNewestClient);
 
         List<Order> ordersNewerThanClient = new ArrayList<>();
         if (!orders.isEmpty()) {
@@ -72,7 +69,7 @@ public class OrderController {
         return new OrderDTO(ordersNewerThanClient);
     }
 
-    @PostMapping(path = "/append",
+    @PostMapping(path = "",
             consumes = "application/json",
             produces = "application/json")
     public Order appendNewOrder(@RequestBody Order orderFromClient) {
