@@ -12,16 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("orders")
+@RequestMapping("v1")
 public class OrderController {
     @Autowired
     private OrderOldVersionRepository repository;
 
     private List<Order> orders = new ArrayList<>();
+    private long counter = 0L;
 
-    @GetMapping(path = "",
+    @GetMapping(path = "/orders",
             produces = "application/json")
-    public OrderDTO fetchNewerOrders(@RequestParam String timestamp) {
+    private OrderDTO fetchNewerOrders(@RequestParam String timestamp) {
         System.out.println("fetchNewerOrders(String)");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -69,11 +70,13 @@ public class OrderController {
         return new OrderDTO(ordersNewerThanClient);
     }
 
-    @PostMapping(path = "",
+    @PostMapping(path = "/orders",
             consumes = "application/json",
             produces = "application/json")
-    public Order appendNewOrder(@RequestBody Order orderFromClient) {
+    private Order appendNewOrder(@RequestBody Order orderFromClient) {
         System.out.println("appendNewOrder(Order)");
+
+        orderFromClient.setId(++counter);
 
         LocalDateTime timestampClient = orderFromClient.getCreatedOn();
         System.out.println("timestampClient: " + timestampClient.toString());
@@ -107,5 +110,19 @@ public class OrderController {
         }
 
         return orderFromClient;
+    }
+
+    @DeleteMapping("/orders/{id}")
+    private void deleteOrder(@PathVariable Long id) {
+        System.out.println("deleteOrder(Long)");
+
+        Order orderToRemove = null;
+        for (Order order : orders) {
+            if (order.getId() == id) {
+                orderToRemove = order;
+                break;
+            }
+        }
+        orders.remove(orderToRemove);
     }
 }

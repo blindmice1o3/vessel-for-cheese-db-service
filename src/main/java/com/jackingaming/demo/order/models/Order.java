@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Order {
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private Long id;
     private LocalDateTime createdOn;
     private List<MenuItemInfo> menuItemInfos;
 
@@ -14,6 +14,14 @@ public class Order {
     public Order(LocalDateTime createdOn, List<MenuItemInfo> menuItemInfos) {
         this.createdOn = createdOn;
         this.menuItemInfos = menuItemInfos;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDateTime getCreatedOn() {
